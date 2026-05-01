@@ -20,13 +20,14 @@ const money = (n) => fmt(n, "$");
 
 // ─── detect CSV type ─────────────────────────────────────────────────────────
 function detectType(headers) {
-  const h = headers.map(s => s.toLowerCase().trim());
-  if (h.includes("brand name") && h.includes("brand score")) return "brands";
-  if (h.includes("search term") && h.includes("opportunity score")) return "search_terms";
-  if (h.includes("seller") && h.includes("seller id")) return "sellers";
-  if (h.includes("asin") && h.includes("page score")) return "products";
-  if (h.includes("brand") && h.includes("total ad spend")) return "adspy";
-  if (h.includes("node id") && h.includes("level 1")) return "subcategories";
+  // Strip BOM, quotes, and whitespace from headers
+  const h = headers.map(s => s.toLowerCase().replace(/^\uFEFF/, "").replace(/['"]/g, "").trim());
+  if (h.some(x => x.includes("brand name")) && h.some(x => x.includes("brand score"))) return "brands";
+  if (h.some(x => x.includes("search term")) && h.some(x => x.includes("opportunity score"))) return "search_terms";
+  if (h.some(x => x.includes("seller id"))) return "sellers";
+  if (h.some(x => x === "asin") && h.some(x => x.includes("page score"))) return "products";
+  if (h.some(x => x.includes("total ad spend"))) return "adspy";
+  if (h.some(x => x.includes("node id"))) return "subcategories";
   return "unknown";
 }
 
